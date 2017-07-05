@@ -1,3 +1,6 @@
+*.txt
+*.d
+*.so
 .idea
 tmp
 *~
