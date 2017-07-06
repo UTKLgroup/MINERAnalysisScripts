@@ -1,10 +1,9 @@
-from ROOT import gROOT, TFile, TChain
+from ROOT import gROOT
 gROOT.LoadMacro("defs/HistManager.cc+")
 gROOT.LoadMacro("defs/BaseHit.cc+")
 gROOT.LoadMacro("defs/BaseTrack.cc+")
-from ROOT import HistManager
-from ROOT import BaseHit
-from ROOT import BaseTrack
+from ROOT import HistManager, TFile, TChain
+
 
 class Cosmic:
     TREE_NAME = 'theTree'
