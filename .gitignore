@@ -1,8 +1,11 @@
+tmp
+figures
+.idea
 *.txt
 *.d
 *.so
-.idea
-tmp
 *~
 *.root
 *.pcm
+*.pyc
+rootalias.py

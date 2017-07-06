@@ -2,7 +2,7 @@ from ROOT import gROOT
 gROOT.LoadMacro("defs/HistManager.cc+")
 gROOT.LoadMacro("defs/BaseHit.cc+")
 gROOT.LoadMacro("defs/BaseTrack.cc+")
-from ROOT import HistManager, TFile, TChain
+from ROOT import HistManager, BaseHit, BaseTrack, TFile, TChain, TH1D, TCanvas
 
 
 class Cosmic:
@@ -24,33 +24,31 @@ class Cosmic:
         self.tfile.Close()
 
     @staticmethod
-    def get_filenames():
-        filenames = []
+    def get_event_tree():
+        event_tree = TChain(Cosmic.TREE_NAME)
         with open(Cosmic.INPUT_FILENAME_LIST) as f_filename:
             for row in f_filename:
-                filenames.append(row.strip())
-        return filenames
+                event_tree.Add(row.strip())
+        return event_tree
 
-    def make_hist(self):
-        event_tree = TChain(Cosmic.TREE_NAME)
-        for filename in Cosmic.get_filenames():
-            event_tree.Add(filename)
+    def plot_primary_energy(self):
+        for event in Cosmic.get_event_tree():
+            for track in event.sTracks:
+                self.fill_1d_hist(track.E(),
+                                  'h_primary_energy_pid_{}'.format(track.pid()), '',
+                                  500, 0, 10000, 1.0,
+                                  '')
+            for hit in event.sHits:
+                if 1 <= hit.detID() <= 8:
+                    self.fill_1d_hist(hit.Edep(),
+                                      'h_hit_edep_pid_{}'.format(hit.pid()), '',
+                                      500, 0, 10, 1.0,
+                                      '')
 
-        for event in event_tree:
-            primary_energy = event.eInc
-            self.fill_1d_hist(primary_energy, 'primary_energy', '', 500, 0, 20, 1.0, '')
-
-            if event.hitC > 0:
-                original_track_id_hits = {}
-                for hit in event.sHits:
-                    original_track_id = hit.preproc()
-                    if original_track_id not in original_track_id_hits:
-                        original_track_id_hits[hit.preproc()] = [hit]
-                    else:
-                        original_track_id_hits[hit.preproc()].append(hit)
-
-                for original_track_id, hits in original_track_id_hits.iteritems():
-                    self.fill_1d_hist(len(hits), 'h_event_hit_count', '', 41, -0.5, 40.5, 1.0, '')
+                    self.fill_1d_hist(hit.Ekin(),
+                                      'h_hit_ekin_pid_{}'.format(hit.pid()), '',
+                                      500, 0, 10, 1.0,
+                                      '')
 
 with Cosmic() as cosmic:
-    cosmic.make_hist()
+    cosmic.plot_primary_energy()
