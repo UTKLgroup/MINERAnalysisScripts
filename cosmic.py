@@ -43,7 +43,7 @@ class Cosmic:
                 tfile.Close()
         return total_elapsed_time
 
-    def plot_primary_energy(self):
+    def plot(self):
         for event in Cosmic.get_event_tree():
             self.fill_1d_hist(event.trackC,
                               'h_event_track_count', '',
@@ -86,4 +86,4 @@ class Cosmic:
                                   '')
 
 with Cosmic() as cosmic:
-    cosmic.plot_primary_energy()
+    cosmic.plot()
