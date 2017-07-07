@@ -32,11 +32,26 @@ class Cosmic:
                 event_tree.Add(row.strip())
         return event_tree
 
+    @staticmethod
+    def get_elapsed_time():
+        total_elapsed_time = 0.0
+        with open(Cosmic.INPUT_FILENAME_LIST) as f_filename:
+            for row in f_filename:
+                tfile = TFile(row.strip())
+                elapsed_time = tfile.Get('hElapsedTime').GetBinContent(1)
+                total_elapsed_time += elapsed_time
+                tfile.Close()
+        return total_elapsed_time
+
     def plot_primary_energy(self):
         for event in Cosmic.get_event_tree():
+            self.fill_1d_hist(event.trackC,
+                              'h_event_track_count', '',
+                              100, 0, 100, 1.0,
+                              '')
+
             for track in event.sTracks:
-                cos_theta_square = (track.p4().Pz() / track.p())**2
-                self.fill_1d_hist(cos_theta_square,
+                self.fill_1d_hist((track.p4().Pz() / track.p())**2,
                                   'h_primary_cos_theta_square_pid_{}'.format(track.pid()), '',
                                   500, 0, 1, 1.0,
                                   '')
@@ -55,19 +70,16 @@ class Cosmic:
                                   500, -50, 50,
                                   1.0,
                                   '')
-
                 self.fill_2d_hist(hit.pos().x(), hit.pos().z(),
                                   'h_hit_pos_xz_pid_{}'.format(hit.pid()), '',
                                   500, 2330, 2330,
                                   500, -1140, -1150,
                                   1.0,
                                   '')
-
                 self.fill_1d_hist(hit.Edep(),
                                   'h_hit_edep_pid_{}'.format(hit.pid()), '',
                                   500, 0, 10, 1.0,
                                   '')
-
                 self.fill_1d_hist(hit.Ekin(),
                                   'h_hit_ekin_pid_{}'.format(hit.pid()), '',
                                   500, 0, 10, 1.0,
