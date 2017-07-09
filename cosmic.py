@@ -38,15 +38,17 @@ class Cosmic:
         return event_tree
 
     @staticmethod
-    def get_elapsed_time():
-        total_elapsed_time = 0.0
+    def get_event_count_elapsed_time():
+        event_count = 0
+        elapsed_time = 0.0
         with open(Cosmic.INPUT_FILENAME_LIST) as f_filename:
             for row in f_filename:
                 tfile = TFile(row.strip())
-                elapsed_time = tfile.Get('hElapsedTime').GetBinContent(1)
-                total_elapsed_time += elapsed_time
+                h_elapsed_time = tfile.Get('hElapsedTime')
+                event_count += h_elapsed_time.GetEntries()
+                elapsed_time += h_elapsed_time.GetBinContent(1)
                 tfile.Close()
-        return total_elapsed_time
+        return event_count, elapsed_time
 
     @staticmethod
     def get_l_z_a_i_from_pid(pid):
@@ -147,5 +149,5 @@ class Cosmic:
 
 with Cosmic() as cosmic:
     cosmic.plot()
-    # print cosmic.get_elapsed_time()
+    # print cosmic.get_event_count_elapsed_time()
     # print cosmic.get_l_z_a_i_from_pid(1000140280)
