@@ -73,6 +73,16 @@ class Cosmic:
             return Cosmic.get_nucleus_name(pid)
 
     def plot(self):
+        event_count, elapsed_time = self.get_event_count_elapsed_time()
+        self.fill_1d_hist(0.5,
+                          'h_event_count', '',
+                          1, 0, 1, event_count,
+                          '')
+        self.fill_1d_hist(0.5,
+                          'h_elapsed_time', '',
+                          1, 0, 1, elapsed_time,
+                          '')
+
         pid_track_counts = {}
         pid_hit_counts = {}
         for event in Cosmic.get_event_tree():
@@ -109,15 +119,15 @@ class Cosmic:
 
                 self.fill_2d_hist(hit.pos().x(), hit.pos().y(),
                                   'h_hit_pos_xy_pid_{}'.format(hit_pid), '',
-                                  500, 2330, 2330,
-                                  500, -50, 50,
-                                  1.0,
+                                  120, 2280, 2400,
+                                  120, -60, 60,
+                                  hit.Edep(),
                                   '')
                 self.fill_2d_hist(hit.pos().x(), hit.pos().z(),
                                   'h_hit_pos_xz_pid_{}'.format(hit_pid), '',
-                                  500, 2330, 2330,
-                                  500, -1140, -1150,
-                                  1.0,
+                                  120, 2280, 2400,
+                                  450, -1500, -1050,
+                                  hit.Edep(),
                                   '')
                 self.fill_1d_hist(hit.Edep(),
                                   'h_hit_edep_pid_{}'.format(hit_pid), '',
