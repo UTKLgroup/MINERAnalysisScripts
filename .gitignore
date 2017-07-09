@@ -8,4 +8,5 @@ figures
 *.root
 *.pcm
 *.pyc
+*.tex
 rootalias.py
