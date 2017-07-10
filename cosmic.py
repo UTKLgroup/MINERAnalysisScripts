@@ -94,7 +94,7 @@ class Cosmic:
             for track in event.sTracks:
                 track_pid = track.pid()
                 if track_pid not in pid_track_counts:
-                    pid_track_counts[track_pid] = 0
+                    pid_track_counts[track_pid] = 1
                 else:
                     pid_track_counts[track_pid] += 1
 
