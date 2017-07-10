@@ -72,6 +72,30 @@ class Cosmic:
         except Exception:
             return Cosmic.get_nucleus_name(pid)
 
+    @staticmethod
+    def get_hit_edep_max(hit_pid):
+        return {
+            11: 0.1,
+            -11: 1.0,
+            22: 0.001,
+            2212: 1.0,
+            2112: 1.0,
+            12: 0.001,
+            -12: 0.001
+        }.get(hit_pid, 10.0)
+
+    @staticmethod
+    def get_hit_ekin_max(hit_pid):
+        return {
+            11: 0.1,
+            -11: 1.0,
+            22: 0.001,
+            2212: 1.0,
+            2112: 1.0,
+            12: 0.001,
+            -12: 0.001
+        }.get(hit_pid, 10.0)
+
     def plot(self):
         event_count, elapsed_time = self.get_event_count_elapsed_time()
         self.fill_1d_hist(0.5,
@@ -141,12 +165,12 @@ class Cosmic:
                                   '')
                 self.fill_1d_hist(hit_edep,
                                   'h_hit_edep_pid_{}'.format(hit_pid), '',
-                                  500, 0, 10,
+                                  20, 0, self.get_hit_edep_max(hit_pid),
                                   hit_weight,
                                   '')
                 self.fill_1d_hist(hit_ekin,
                                   'h_hit_ekin_pid_{}'.format(hit_pid), '',
-                                  500, 0, 10,
+                                  20, 0, self.get_hit_ekin_max(hit_pid),
                                   hit_weight,
                                   '')
 
