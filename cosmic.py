@@ -85,6 +85,7 @@ class Cosmic:
 
         pid_track_counts = {}
         pid_hit_counts = {}
+        pid_hit_edeps = {}
         for event in Cosmic.get_event_tree():
             self.fill_1d_hist(event.trackC,
                               'h_event_track_count', '',
@@ -111,53 +112,77 @@ class Cosmic:
                 if hit.detID() > 8 or hit.detID() < 1:
                     continue
 
-                hit_weight = hit.Weight()
                 hit_pid = hit.pid()
+                hit_weight = hit.Weight()
+                hit_edep = hit.Edep()
+                hit_ekin = hit.Ekin()
+
                 if hit_pid not in pid_hit_counts:
                     pid_hit_counts[hit_pid] = hit_weight
                 else:
                     pid_hit_counts[hit_pid] += hit_weight
 
-                hit_edep = hit.Edep() * hit_weight
-                hit_ekin = hit.Ekin() * hit_weight
+                if hit_pid not in pid_hit_edeps:
+                    pid_hit_edeps[hit_pid] = hit_edep * hit_weight
+                else:
+                    pid_hit_edeps[hit_pid] += hit_edep * hit_weight
+
                 self.fill_2d_hist(hit.pos().x(), hit.pos().y(),
                                   'h_hit_pos_xy_pid_{}'.format(hit_pid), '',
                                   120, 2280, 2400,
                                   120, -60, 60,
-                                  hit_edep,
+                                  hit_weight,
                                   '')
                 self.fill_2d_hist(hit.pos().x(), hit.pos().z(),
                                   'h_hit_pos_xz_pid_{}'.format(hit_pid), '',
                                   120, 2280, 2400,
                                   450, -1500, -1050,
-                                  hit_edep,
+                                  hit_weight,
                                   '')
                 self.fill_1d_hist(hit_edep,
                                   'h_hit_edep_pid_{}'.format(hit_pid), '',
-                                  500, 0, 10, 1.0,
+                                  500, 0, 10,
+                                  hit_weight,
                                   '')
                 self.fill_1d_hist(hit_ekin,
                                   'h_hit_ekin_pid_{}'.format(hit_pid), '',
-                                  500, 0, 10, 1.0,
+                                  500, 0, 10,
+                                  hit_weight,
                                   '')
 
         sorted_pid_track_counts = sorted(pid_track_counts.items(), key=operator.itemgetter(1), reverse=True)
         sorted_pid_hit_counts = sorted(pid_hit_counts.items(), key=operator.itemgetter(1), reverse=True)
+        sorted_pid_hit_edeps = sorted(pid_hit_edeps.items(), key=operator.itemgetter(1), reverse=True)
+
         pprint(sorted_pid_hit_counts)
+        pprint(sorted_pid_hit_edeps)
         pprint(sorted_pid_track_counts)
 
-        with open('cosmic.tex', 'w') as f_pid_count:
+        with open('cosmic.tex', 'w') as f_tex:
+            event_count, elapsed_time = cosmic.get_event_count_elapsed_time()
+            f_tex.write('event_count = {}\n'.format(event_count))
+            f_tex.write('elapsed_time = {}\n'.format(elapsed_time))
+
+            f_tex.write('\nsorted_pid_hit_count\n')
             for sorted_pid_hit_count in sorted_pid_hit_counts:
                 pid = sorted_pid_hit_count[0]
                 hit_count = sorted_pid_hit_count[1]
                 name = self.get_particle_name(pid)
-                f_pid_count.write('{} & {} & {} \\\\ \n'.format(pid, name.replace('_', '\_'), hit_count))
+                f_tex.write('{} & {} & {} \\\\ \n'.format(pid, name.replace('_', '\_'), hit_count))
 
+            f_tex.write('\nsorted_pid_hit_edep\n')
+            for sorted_pid_hit_edep in sorted_pid_hit_edeps:
+                pid = sorted_pid_hit_edep[0]
+                hit_edep = sorted_pid_hit_edep[1]
+                name = self.get_particle_name(pid)
+                f_tex.write('{} & {} & {} \\\\ \n'.format(pid, name.replace('_', '\_'), hit_edep))
+
+            f_tex.write('\nsorted_pid_track_count\n')
             for sorted_pid_track_count in sorted_pid_track_counts:
                 pid = sorted_pid_track_count[0]
                 track_count = sorted_pid_track_count[1]
                 name = self.get_particle_name(pid)
-                f_pid_count.write('{} & {} & {} \\\\ \n'.format(pid, name.replace('_', '\_'), track_count))
+                f_tex.write('{} & {} & {} \\\\ \n'.format(pid, name.replace('_', '\_'), track_count))
 
 
 with Cosmic() as cosmic:
