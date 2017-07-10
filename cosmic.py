@@ -154,10 +154,6 @@ class Cosmic:
         sorted_pid_hit_counts = sorted(pid_hit_counts.items(), key=operator.itemgetter(1), reverse=True)
         sorted_pid_hit_edeps = sorted(pid_hit_edeps.items(), key=operator.itemgetter(1), reverse=True)
 
-        pprint(sorted_pid_hit_counts)
-        pprint(sorted_pid_hit_edeps)
-        pprint(sorted_pid_track_counts)
-
         with open('cosmic.tex', 'w') as f_tex:
             event_count, elapsed_time = cosmic.get_event_count_elapsed_time()
             f_tex.write('event_count = {}\n'.format(event_count))
@@ -176,6 +172,15 @@ class Cosmic:
                 hit_edep = sorted_pid_hit_edep[1]
                 name = self.get_particle_name(pid)
                 f_tex.write('{} & {} & {} \\\\ \n'.format(pid, name.replace('_', '\_'), hit_edep))
+
+            f_tex.write('\nsorted_pid_hit_avg_edep\n')
+            for sorted_pid_hit_edep in sorted_pid_hit_edeps:
+                pid = sorted_pid_hit_edep[0]
+                hit_edep = sorted_pid_hit_edep[1]
+                hit_count = pid_hit_counts[pid]
+                hit_avg_edep = hit_edep / hit_count
+                name = self.get_particle_name(pid)
+                f_tex.write('{} & {} & {} \\\\ \n'.format(pid, name.replace('_', '\_'), hit_avg_edep))
 
             f_tex.write('\nsorted_pid_track_count\n')
             for sorted_pid_track_count in sorted_pid_track_counts:
