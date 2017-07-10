@@ -111,29 +111,32 @@ class Cosmic:
                 if hit.detID() > 8 or hit.detID() < 1:
                     continue
 
+                hit_weight = hit.Weight()
                 hit_pid = hit.pid()
                 if hit_pid not in pid_hit_counts:
                     pid_hit_counts[hit_pid] = 0
                 else:
-                    pid_hit_counts[hit_pid] += 1
+                    pid_hit_counts[hit_pid] += hit_weight
 
+                hit_edep = hit.Edep() * hit_weight
+                hit_ekin = hit.Ekin() * hit_weight
                 self.fill_2d_hist(hit.pos().x(), hit.pos().y(),
                                   'h_hit_pos_xy_pid_{}'.format(hit_pid), '',
                                   120, 2280, 2400,
                                   120, -60, 60,
-                                  hit.Edep(),
+                                  hit_edep,
                                   '')
                 self.fill_2d_hist(hit.pos().x(), hit.pos().z(),
                                   'h_hit_pos_xz_pid_{}'.format(hit_pid), '',
                                   120, 2280, 2400,
                                   450, -1500, -1050,
-                                  hit.Edep(),
+                                  hit_edep,
                                   '')
-                self.fill_1d_hist(hit.Edep(),
+                self.fill_1d_hist(hit_edep,
                                   'h_hit_edep_pid_{}'.format(hit_pid), '',
                                   500, 0, 10, 1.0,
                                   '')
-                self.fill_1d_hist(hit.Ekin(),
+                self.fill_1d_hist(hit_ekin,
                                   'h_hit_ekin_pid_{}'.format(hit_pid), '',
                                   500, 0, 10, 1.0,
                                   '')
