@@ -114,7 +114,7 @@ class Cosmic:
                 hit_weight = hit.Weight()
                 hit_pid = hit.pid()
                 if hit_pid not in pid_hit_counts:
-                    pid_hit_counts[hit_pid] = 0
+                    pid_hit_counts[hit_pid] = hit_weight
                 else:
                     pid_hit_counts[hit_pid] += hit_weight
 
