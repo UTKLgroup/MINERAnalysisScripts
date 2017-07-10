@@ -3,6 +3,45 @@ from rootalias import *
 f_output = TFile('cosmic.root')
 figure_dir = '/Users/juntinghuang/google_drive/slides/beamer/20170706_miner_cosmic_hits/figures'
 
+
+def get_elapsed_time():
+    h_elapsed_time = f_output.Get('h_elapsed_time')
+    return h_elapsed_time.GetBinContent(1)
+
+
+def get_elapsed_time():
+    h_event_count = f_output.Get('h_event_count')
+    return h_event_count.GetBinContent(1)
+
+
+def plot_track_count():
+    gStyle.SetOptStat('mer')
+    h1 = f_output.Get('h_event_track_count')
+    c1 = TCanvas('c1', 'c1', 800, 600)
+    set_margin()
+    gPad.SetLogy()
+
+    set_h1_style(h1)
+    h1.GetXaxis().SetRangeUser(0, 20)
+    h1.GetXaxis().SetTitle('Cosmic Ray Count')
+    h1.GetYaxis().SetTitle('Cosmic Shower Count')
+    h1.Draw('hist')
+
+    c1.Update()
+    p1 = h1.GetListOfFunctions().FindObject("stats")
+    p1.SetTextColor(h1.GetLineColor())
+    p1.SetLineColor(h1.GetLineColor())
+    p1.SetX1NDC(0.7)
+    p1.SetY1NDC(0.75)
+    p1.SetX2NDC(0.95)
+    p1.SetY2NDC(0.95)
+    p1.Draw()
+
+    c1.Update()
+    c1.SaveAs('{}/plot_track_count.pdf'.format(figure_dir))
+    raw_input('Press any key to continue.')
+
+
 def plot_primary_energy(**kwargs):
     pid = kwargs.get('pid', 13)
     rebin = kwargs.get('rebin', 1)
@@ -86,15 +125,15 @@ def plot_primary_cos_theta_square(**kwargs):
     c1.SaveAs('{}/plot_primary_cos_theta_square.pid_{}.pdf'.format(figure_dir, pid))
     raw_input('Press any key to continue.')
 
-def plot_hit():
-    pid = 11
+def plot_hit(pid):
     h_xy = f_output.Get('h_hit_pos_xy_pid_{}'.format(pid))
     h_xz = f_output.Get('h_hit_pos_xz_pid_{}'.format(pid))
     h_edep = f_output.Get('h_hit_edep_pid_{}'.format(pid))
+    h_ekin = f_output.Get('h_hit_ekin_pid_{}'.format(pid))
 
-    canvas_y_ratio = 0.3
+    canvas_y_ratio = 0.4
     gStyle.SetOptStat(0)
-    c1 = TCanvas('c1', 'c1', 1000, 600)
+    c1 = TCanvas('c1', 'c1', 1200, 800)
     set_h2_color_style()
 
     pad1 = TPad("pad1", "pad1", 0, canvas_y_ratio, 0.5, 1)
@@ -108,7 +147,7 @@ def plot_hit():
     h_xy.GetYaxis().SetTitle('Y (mm)')
     h_xy.GetZaxis().SetTitle('Energy Deposition (MeV)')
     h_xy.GetYaxis().SetTitleOffset(1.5)
-    h_xy.GetXaxis().SetTitleOffset(1.5)
+    h_xy.GetXaxis().SetTitleOffset(2)
     h_xy.Draw("colz")
 
     c1.cd()
@@ -122,25 +161,46 @@ def plot_hit():
     h_xz.GetXaxis().SetTitle('X (mm)')
     h_xz.GetYaxis().SetTitle('Z (mm)')
     h_xz.GetZaxis().SetTitle('Energy Deposition (MeV)')
-    h_xz.GetYaxis().SetTitleOffset(2.5)
-    h_xz.GetXaxis().SetTitleOffset(1.5)
+    h_xz.GetYaxis().SetTitleOffset(3)
+    h_xz.GetXaxis().SetTitleOffset(2)
     h_xz.Draw("colz")
 
     c1.cd()
-    pad3 = TPad('pad3', 'pad3', 0, 0, 1, canvas_y_ratio)
-    # pad3.SetTopMargin(0)
-    pad3.SetLeftMargin(0.1)
-    pad3.SetBottomMargin(0.4)
+    pad3 = TPad('pad3', 'pad3', 0, 0, 0.5, canvas_y_ratio)
+    pad3.SetRightMargin(0.15)
+    pad3.SetLeftMargin(0.25)
+    pad3.SetBottomMargin(0.25)
     pad3.Draw()
     pad3.cd()
     gPad.SetGrid()
     gPad.SetLogy()
     set_h1_style(h_edep)
-    h_edep.GetXaxis().SetRangeUser(0, 1)    
+    h_edep.GetXaxis().SetRangeUser(0, 1)
+    h_edep.GetXaxis().SetTitle('Energy Deposition (MeV)')
+    h_edep.GetYaxis().SetTitle('Hit Count')
+    h_edep.GetXaxis().SetTitleOffset(2.5)
+    h_edep.GetYaxis().SetTitleOffset(2)
     h_edep.Draw()
 
+    c1.cd()
+    pad4 = TPad('pad4', 'pad4', 0.5, 0, 1, canvas_y_ratio)
+    pad4.SetRightMargin(0.15)
+    pad4.SetLeftMargin(0.25)
+    pad4.SetBottomMargin(0.25)
+    pad4.Draw()
+    pad4.cd()
+    gPad.SetGrid()
+    gPad.SetLogy()
+    set_h1_style(h_ekin)
+    h_ekin.GetXaxis().SetRangeUser(0, 1)
+    h_ekin.GetXaxis().SetTitle('Track Energy (MeV)')
+    h_ekin.GetYaxis().SetTitle('Hit Count')
+    h_ekin.GetXaxis().SetTitleOffset(2.5)
+    h_ekin.GetYaxis().SetTitleOffset(2)
+    h_ekin.Draw()
+
     c1.Update()
-    c1.SaveAs('{}/plot_hit.pdf'.format(figure_dir))
+    c1.SaveAs('{}/plot_hit.pid_{}.pdf'.format(figure_dir, pid))
     raw_input('Press any key to continue.')
 
 # plot_primary_energy(pid=13,
@@ -157,4 +217,8 @@ def plot_hit():
 # plot_primary_cos_theta_square(pid=11,
 #                               particle_name_tex='e')
 
-plot_hit()
+# plot_hit(11)
+plot_hit(12)
+# plot_hit(22)
+# plot_hit(13)
+# plot_track_count()
