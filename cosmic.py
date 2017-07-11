@@ -129,7 +129,7 @@ class Cosmic:
                                   '')
                 self.fill_1d_hist(track.E(),
                                   'h_primary_energy_pid_{}'.format(track_pid), '',
-                                  500, 0, 10000, 1.0,
+                                  10000, 0, 10000, 1.0,
                                   '')
 
             for hit in event.sHits:
@@ -165,12 +165,12 @@ class Cosmic:
                                   '')
                 self.fill_1d_hist(hit_edep,
                                   'h_hit_edep_pid_{}'.format(hit_pid), '',
-                                  20, 0, self.get_hit_edep_max(hit_pid),
+                                  100000, 0, 100.0,
                                   hit_weight,
                                   '')
                 self.fill_1d_hist(hit_ekin,
                                   'h_hit_ekin_pid_{}'.format(hit_pid), '',
-                                  20, 0, self.get_hit_ekin_max(hit_pid),
+                                  100000, 0, 100.0,
                                   hit_weight,
                                   '')
 
@@ -213,6 +213,18 @@ class Cosmic:
                 name = self.get_particle_name(pid)
                 f_tex.write('{} & {} & {} \\\\ \n'.format(pid, name.replace('_', '\_'), track_count))
 
+            f_tex.write('\nfigures\n')
+            for pid in [11, -11, 22, 2212, 2112, 12, -12]:
+                particle_name = self.get_particle_name(pid).replace('_', '\_')
+                f_tex.write('\n%.........................................................\n\n')
+                f_tex.write('\\begin{frame}\n')
+                f_tex.write('\\frametitle{{Hits Due to {}}}\n'.format(particle_name))
+                f_tex.write('\\vspace{-0.6cm}\n')
+                f_tex.write('\\begin{figure}\n')
+                f_tex.write('\\includegraphics[scale = 0.55]{{figures/{{plot_hit.pid_{}}}.pdf}}\n'.format(pid))
+                f_tex.write('\\caption{{Distributions of hit position, hit energy deposition and particle energy for {}.}}\n'.format(particle_name))
+                f_tex.write('\\end{figure}\n')
+                f_tex.write('\\end{frame}\n')
 
 with Cosmic() as cosmic:
     cosmic.plot()
